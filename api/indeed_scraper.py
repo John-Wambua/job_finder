@@ -24,7 +24,10 @@ def get_record(job_card):
     
     job_id = job_card.get('data-jk')
     job_title = job_card.h2.text.replace('new','')
-    company = job_card.find('span', 'companyName').text.strip()
+    if (job_card.find('span', 'companyName') is not None):
+        company = job_card.find('span', 'companyName').text.strip()
+    else:
+        company = ''
     post_date = job_card.find('span', 'date').text
     today = datetime.today().strftime('%Y-%m-%d')
     summary = job_card.find('div', 'job-snippet').text.strip().replace('\n', ' ')
@@ -56,6 +59,8 @@ def main(position, location):
           break
           
     # export data to pandas dataframe
+    print(records)
     results = pd.DataFrame(records)
-    results.columns = ['JobID','JobTitle', 'Company', 'PostDate', 'ExtractDate','Summary', 'JobURL']
+    results.columns = ['JobID','JobTitle', 'Company', 'PostDate', 'ExtractDate',
+                        'Summary', 'JobURL']
     return results
