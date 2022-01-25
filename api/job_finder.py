@@ -8,21 +8,30 @@ Created on Wed Nov 17 14:08:13 2021
 
 import PyPDF2
 import pandas as pd
-import numpy as np
 import process_cv as pcv
 import process_job_postings as pjp
 import indeed_scraper as isc
 import pickle
-from nltk.tokenize import word_tokenize,sent_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import LabelEncoder
 
+
+le = LabelEncoder()
 
 tfidf_vec = TfidfVectorizer()
+
+model = pickle.load(open('nb_model.pkl','rb'))
+
+word_vectorizer = pickle.load(open('tfidf_vectorizer.pkl','rb'))
+
+label_encoder = pickle.load(open('label_encoder.pkl', 'rb'))
 
 def main(filename):
     # Extract text from CV
     path = f'assets/cvs/{filename}'
+    # path = 'assets/cvs/sample_cv_2.pdf'
+    
     user_input = ''
     with open(path,'rb') as pdf_file:
         read_pdf = PyPDF2.PdfFileReader(pdf_file)
@@ -37,7 +46,10 @@ def main(filename):
     
     corpus = pcv.main(user_input)
     
-    results = isc.main('software engineer', 'remote')
+    resume_vectorized = word_vectorizer.transform([corpus])
+    job_type =  label_encoder.inverse_transform(model.predict(resume_vectorized
+                                                              .todense()))[0]
+    results = isc.main(job_type, 'remote')
     
     # Vectorize job postings
     job_postings = pjp.process_postings(results)
@@ -74,7 +86,7 @@ def main(filename):
     final_df = pd.DataFrame(columns=results.columns)
     # print(final_df.columns)
     
-    job_probs_df = pd.DataFrame({'JobID': top_jobs.index, 'Likelihood': top_jobs.values})
+    job_probs_df = pd.DataFrame({'JobID': top_jobs.index, 'Likelihood': top_jobs.values, 'JobType': job_type})
     
     for top_job_id, job_value in top_jobs.items():
         print(top_job_id, job_value)
@@ -85,4 +97,6 @@ def main(filename):
                 final_df.loc[index] = job
                     
     final_df = pd.merge(final_df.drop_duplicates(subset=['JobID']), job_probs_df, on = 'JobID')
+    
+    
     return final_df

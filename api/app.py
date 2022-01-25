@@ -11,14 +11,14 @@ from flask_restful import Resource, Api, reqparse
 import werkzeug
 import os
 import job_finder as jf
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 app = Flask(__name__)
 api = Api(app)
 
 CORS(app)
 
-# app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 parser = reqparse.RequestParser()
 
@@ -30,20 +30,30 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# class RetrieveJobs(Resource):
+#     def get(self, filename):
+#         print(f'Filename -- {filename}')
+        
+#         if (filename == None):
+#             resp = jsonify({
+#                 'status' : 'fail',
+#                 'message': 'File Not Found'
+#                 })
+#             resp.status_code = 404
+#             return resp
+        
+#         jobs_df = jf.main(filename)
+        
+#         resp = jsonify({
+#                 'status' : 'success',
+#                 'data': jobs_df.to_dict('records')
+#                 })
+#         resp.status_code = 200
+#         return resp
+    
+    
+
 class CVProcessor(Resource):
-    
-    def get(self, filename):
-        print(f'Filename -- {filename}')
-        
-        
-        jobs_df = jf.main(filename)
-        resp = jsonify({
-                'status' : 'success',
-                'data': jobs_df.to_dict('records')
-                })
-        resp.status_code = 201
-        return resp
-    
     
     def post(self):
         parser.add_argument('cv_file', type=werkzeug.datastructures.FileStorage, location='files')
@@ -66,15 +76,18 @@ class CVProcessor(Resource):
                 })
             resp.status_code = 400
             return resp
+        
         if cv_file and allowed_file(cv_file.filename):
+            
             cv_file.save(os.path.join(UPLOAD_DIR, cv_file.filename))
-            # jobs_df = jf.main(cv_file.filename)
+            
+            jobs_df = jf.main(cv_file.filename)
             print(f'FILENAME {cv_file.filename}')
             
             resp = jsonify({
                 'status' : 'success',
                 'message' : 'File successfully uploaded',
-                # 'data': jobs_df.to_dict('records')
+                'data': jobs_df.to_dict('records')
                 })
             resp.status_code = 201
             return resp
@@ -88,8 +101,7 @@ class CVProcessor(Resource):
         
     
 
-api.add_resource(CVProcessor,'/cv_processor/<filename>')
-# api.add_resource(Student, '/students/<student_id>')
+api.add_resource(CVProcessor,'/cv_processor')
 
 
 if __name__ == "__main__":
