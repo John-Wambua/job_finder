@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 
-export default () =>{
+export default ({jobTitle, companyName, postDate, jobSummary, jobUrl}) =>{
 
     return (
         <Grid item >
@@ -16,24 +16,23 @@ export default () =>{
                 <CardHeader
                     avatar={
                         <Avatar sx={{ bgcolor: colors.red[500] }} aria-label="recipe">
-                            S
+                            {companyName.charAt(0)}
                         </Avatar>
                     }
 
-                    title="Microsoft"
-                    subheader="Posted 30 days ago"
+                    title={companyName}
+                    subheader={postDate.replace("Posted"," ")}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="body1" component="div">
-                        Software Engineer Intern
+                        {jobTitle}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Lizards are a widespread group of squamate reptiles, with over 6,000
-                        species, ranging across all continents except Antarctica
+                        {jobSummary}
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small">View Job</Button>
+                    <Button href={jobUrl} target='_blank' size="small">View Job</Button>
                 </CardActions>
             </Card>
             <Divider variant="inset" component="li" />

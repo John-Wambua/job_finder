@@ -16,6 +16,7 @@ export default ({name})=>{
         setFile(acceptedFiles[0])
         console.log('All Files',acceptedFiles)
         console.log('Single File',acceptedFiles[0])
+        console.log('File Name', acceptedFiles[0].name)
     }, [])
 
     useEffect(()=> {
@@ -34,14 +35,14 @@ export default ({name})=>{
 
     return (
         <>
-            <Grid item {...getRootProps()}>
+            <Grid style={{height: '200px'}} item {...getRootProps()}>
                 <input {...getInputProps()} />
                 {
                     !isDragActive &&
-                    <p align="center">Drag 'n' drop your resume here, or click to select it <br/>
+                    <p align="center" style={{marginTop: '50px'}}>Drag 'n' drop your resume here, or click to select it for job matching<br/>
                         <em>(Only *.pdf and *.docx images will be accepted)</em> </p>
                 }
-                {isDragActive && !isDragReject && <p align="center">Drop the resume here ...</p>}
+                {isDragActive && !isDragReject && <p align="center" style={{marginTop: '50px'}}>Drop the resume here ...</p>}
                 {isDragReject && <p align="center">File type not accepted</p>}
                 {isFileTooLarge && (
                     <div className="text-danger mt-2">

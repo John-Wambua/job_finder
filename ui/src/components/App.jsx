@@ -1,15 +1,24 @@
-import React from "react"
-import Home from "./upload/DropResume";
+import React, {useState} from "react"
+import DropResume from "./upload/DropResume";
 import JobPostings from "./jobs/JobPostings";
 import {Container} from "@mui/material";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const App = ()=>{
+import Navbar from "./Navbar";
+import Store from "../state/store";
+
+
+const App = ()=> {
+
     return (
-        <Container>
-            <Home/>
-            <JobPostings/>
+        <Store>
+            <Container>
+                <Navbar/>
+                <DropResume/>
+                <JobPostings/>
+            </Container>
+        </Store>
 
-        </Container>
     )
 }
 
